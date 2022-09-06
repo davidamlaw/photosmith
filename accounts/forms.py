@@ -12,7 +12,3 @@ class SignUpForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['email'].label = 'Email Address:'
-
-def password_check(request):
-    password = request.POST.get('password')
-    

@@ -58,11 +58,6 @@ class User(PermissionsMixin, AbstractBaseUser):
     is_editor = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False) # a admin user; non super-user
     is_admin = models.BooleanField(default=False) # a superuser
-    # ROLES = [
-    #     ('0', 'Buyer'),
-    #     ('1', 'Seller'),
-    # ]
-    # role = models.CharField(max_length=1, choices=ROLES, default='0')
 
     # notice the absence of a "Password field", that is built in.
 
