@@ -1,0 +1,23 @@
+body {
+  margin-top: 80px;
+}
+
+.title {
+  font-size: .75rem;
+  font-weight: bold;
+  margin-top: 2px;
+}
+
+.date {
+  font-size: .75rem;
+}
+
+.yearbutton {
+  padding-top: 9px;
+  padding-bottom: 10px;
+  background-color: #222222;
+  color: white;
+  border-radius: 4px;
+  border-width: 0px;
+  margin-bottom: 20px;
+}

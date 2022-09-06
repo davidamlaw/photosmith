@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="row">
+  <div class="col-2">
+    <h5>Year</h5>
+    <form class="" method="GET">
+      {% csrf_token %}
+      <select class="yearbutton" name="search">
+        {% for y in year %}
+        <option value="{{ y.year }}">{{ y.year }}</option>
+        {% endfor %}
+      </select>
+      <input type="hidden" name="page" value="1">
+      <button type="submit" class="btn btn-dark">Go</button>
+    </form>
+    <h5>Tags</h5>
+    {% for tag in tags %}
+    <a href="{% url 'photo:list' %}?search={{ tag.name }}&page=1" class="link-dark">{{ tag.name }}</a><br/>
+    {% endfor %}
+  </div>
+  <div class="col-2">
+    <h5>People</h5>
+    {% for person in people %}
+    <a href="{% url 'photo:list' %}?search={{ person.name }}&page=1" class="link-dark">{{ person.name }}</a><br/>
+    {% endfor %}
+  </div>
+  <div class="col-8">
+    <div class="row">
+      <div class="text-centered"><h3>{{ message }}</h3></div>
+        {% for photo in photos %}
+        <a href="{% url 'photo:detail' photo.id %}" class="d-block mb-4 w-25">
+        <img src="{{photo.image.url}}" class="img-fluid img-thumbnail rounded" alt="{{photo.title}}" />
+        <div class="title text-white">{{ photo.title }}</div>
+        <div class="date text-white"><em>Added {{ photo.created|date:'N d Y' }}</em></div>
+        <div class="date text-white"><em>By {{ photo.submitter }}</em></div>
+        <div class="date text-white">Photo taken in <strong>{{ photo.year }}</strong></div>
+        </a>
+        {% endfor %}
+    </div>
+    <!-- Pagination code starts here -->
+    <div class="container-fluid">
+      {% for page_number in photos.adjusted_elided_pages %}
+        {% if page_number == photos.paginator.ELLIPSIS %}
+            {{page_number}}
+        {% else %}
+          {% if page_number != photos.number %}
+            <a href="?page={{ page_number }}{% if request.GET.search %}&search={{ request.GET.search }}
+            {% endif %}" class="float-right btn btn-dark">{{ page_number }}</a>
+          {% else %}
+            <span class="float-right btn btn-warning"><strong>{{page_number}}</strong></span>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    <!-- Pagination code ends here -->
+  </div>
+
+</div>
+
+{% endblock body %}
