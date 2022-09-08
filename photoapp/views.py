@@ -38,45 +38,7 @@ def photo_list_view(request):
     }
     return render(request, 'photoapp/list.html', context)
 
-# class PhotoListView(ListView):
-#     model = Photo
-#     template_name = 'photoapp/list.html'
-#     context_object_name = 'photos'
-#
-# class PhotoTagListView(PhotoListView):
-#     template_name = 'photoapp/taglist.html'
-#
-#     def get_tag(self):
-#         return self.kwargs.get('tag')
-#
-#     def get_queryset(self):
-#         return self.model.objects.filter(tags__slug=self.get_tag())
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context["tag"] = self.get_tag()
-#         context["year"] = Year.objects.all().order_by('year')
-#         context["tags"] = GenericTag.objects.all().order_by('name')
-#         context["people"] = PeopleTag.objects.all().order_by('name')
-#         return context
-#
-# class PhotoPeopleListView(PhotoListView):
-#     template_name = 'photoapp/taglist.html'
-#
-#     def get_tag(self):
-#         return self.kwargs.get('tag')
-#
-#     def get_queryset(self):
-#         return self.model.objects.filter(tags__slug=self.get_tag())
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context["people"] = self.get_tag()
-#         context["tags"] = GenericTag.objects.all().order_by('name')
-#         context["people"] = PeopleTag.objects.all().order_by('name')
-#         return context
-
-class PhotoDetailView(DetailView):
+class PhotoDetailView(LoginRequiredMixin, DetailView):
     model = Photo
     template_name = 'photoapp/detail.html'
     context_object_name = 'photo'
@@ -102,7 +64,7 @@ class UserIsSubmitter(UserPassesTestMixin):
         else:
             raise PermissionDenied('Sorry you are not allowed here')
 
-class PhotoUpdateView(UserIsSubmitter, UpdateView):
+class PhotoUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'photoapp/update.html'
     model = Photo
     fields = ['title', 'description', 'year', 'people', 'tags']
