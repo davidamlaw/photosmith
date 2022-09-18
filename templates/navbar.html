@@ -25,6 +25,7 @@
           <form class="form-inline" method="GET">
             {% csrf_token %}
             <input class="form-control ml-4 mr-4" type="search" name="search" placeholder="Search Photos" aria-label="Search">
+            <input type="hidden" name="page" value="1">
           </form>
         </li>
         {% if user.is_editor %}

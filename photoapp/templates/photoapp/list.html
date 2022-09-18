@@ -7,7 +7,7 @@
     <h5>Year</h5>
     <form class="" method="GET">
       {% csrf_token %}
-      <select class="yearbutton" name="search">
+      <select class="yearbutton" name="year">
         {% for y in year %}
         <option value="{{ y.year }}">{{ y.year }}</option>
         {% endfor %}
@@ -17,18 +17,30 @@
     </form>
     <h5>Tags</h5>
     {% for tag in tags %}
-    <a href="{% url 'photo:list' %}?search={{ tag.name }}&page=1" class="link-dark">{{ tag.name }}</a><br/>
+    <a href="{% url 'photo:list' %}?tag={{ tag.name }}&page=1" class="link-dark">{{ tag.name }}</a><br/>
     {% endfor %}
   </div>
   <div class="col-2">
     <h5>People</h5>
     {% for person in people %}
-    <a href="{% url 'photo:list' %}?search={{ person.name }}&page=1" class="link-dark">{{ person.name }}</a><br/>
+      {% if person.name == 'None' %}
+        <a href="{% url 'photo:list' %}?person={{ person.name }}&page=1" class="link-dark"><strong>{{ person.name }}</strong></a><br/>
+      {% else %}
+        <a href="{% url 'photo:list' %}?person={{ person.name }}&page=1" class="link-dark">{{ person.name }}</a><br/>
+      {% endif %}
     {% endfor %}
   </div>
   <div class="col-8">
     <div class="row">
-      <div class="text-centered"><h3>{{ message }}</h3></div>
+      <a href="{% url 'photo:list' %}?page=1" class="ml-4"><button class="btn btn-sm btn-warning">See All Photos</button></a>
+      <div class="text-centered m-2"><h3>{{ message }}</h3>
+        <h4>Sort By:
+        <a href="{% url 'photo:list' %}?{{ search_m }}={{ search }}&sort_by=createdasc&page=1"><button class='btn btn-sm btn-dark'>Date Added ▲</button></a>
+        <a href="{% url 'photo:list' %}?{{ search_m }}={{ search }}&sort_by=createddesc&page=1"><button class='btn btn-sm btn-dark'>Date Added ▼</button></a>
+        <a href="{% url 'photo:list' %}?{{ search_m }}={{ search }}&sort_by=yearasc&page=1"><button class='btn btn-sm btn-dark'>Year ▲</button></a>
+        <a href="{% url 'photo:list' %}?{{ search_m }}={{ search }}&sort_by=yeardesc&page=1"><button class='btn btn-sm btn-dark'>Year ▼</button></a>
+        </h4>
+      </div>
         {% for photo in photos %}
         <a href="{% url 'photo:detail' photo.id %}" class="d-block mb-4 w-25">
         <img src="{{photo.image.url}}" class="img-fluid img-thumbnail rounded" alt="{{photo.title}}" />
@@ -46,8 +58,7 @@
             {{page_number}}
         {% else %}
           {% if page_number != photos.number %}
-            <a href="?page={{ page_number }}{% if request.GET.search %}&search={{ request.GET.search }}
-            {% endif %}" class="float-right btn btn-dark">{{ page_number }}</a>
+            <a href="?{{ search_m }}={{ search }}&sort_by={{ sort }}&page={{ page_number }}" class="float-right btn btn-dark">{{ page_number }}</a>
           {% else %}
             <span class="float-right btn btn-warning"><strong>{{page_number}}</strong></span>
           {% endif %}

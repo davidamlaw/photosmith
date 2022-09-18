@@ -7,9 +7,9 @@
   {{ photo.submitter.last_name }}</strong></p>
   {% if user.is_editor %}
     <p class="text-center">
-      <span>See something wrong? <a href="{% url 'photo:update' photo.id %}" class="text-white px-2">Edit details here.</a></span>
+      <span>See something wrong? <a href="{% url 'photo:update' photo.id %}" class="text-white px-2"><strong>Edit details here.</strong></a></span>
       {% if user == photo.submitter %}
-      <span><a href="{% url 'photo:delete' photo.id %}" class="text-danger px-2">Delete</a></span>
+      <span><a href="{% url 'photo:delete' photo.id %}" class="text-danger px-2"><strong>Delete</strong></a></span>
       {% endif %}
     </p>
   {% endif %}
@@ -21,19 +21,42 @@
     </a>
   </div>
   <div class="col-md-4">
-    <h4>More about this photo:</h4>
-    <ul class="list-group list-group-horizontal-lg list-unstyled py-4">
+    <h6>{{ photo.description }}</h6>
+    <h4 class="my-4">More about this photo:</h4>
+    <strong>Year</strong>
+    <ul class="list-group list-group-horizontal-lg list-unstyled py-2">
+      <li><a href="{% url 'photo:list' %}?search={{ photo.year }}&page=1" class="btn btn-sm list-group-item list-group-item-primary">{{photo.year}}</a></li>
+    </ul>
+    <strong>People</strong>
+    <ul class="list-group list-group-horizontal-lg list-unstyled py-2">
       {% for person in photo.people.all %}
         <li><a href="{% url 'photo:list' %}?search={{ person.name }}&page=1" class="btn btn-sm list-group-item list-group-item-primary">{{person.name}}</a></li>
       {% endfor %}
     </ul>
-    <ul class="list-group list-group-horizontal-lg list-unstyled py-4">
+    <strong>Tags</strong>
+    <ul class="list-group list-group-horizontal-lg list-unstyled py-2">
       {% for tag in photo.tags.all %}
         <li><a href="{% url 'photo:list' %}?search={{ tag.name }}&page=1" class="btn btn-sm list-group-item list-group-item-primary">{{tag.name}}</a></li>
       {% endfor %}
     </ul>
-    <p>{{ photo.description }}</p>
-    <button type="submit" class="btn btn-primary mb-3" onClick="javascript:history.go(-1);">Back</button>
+    <h5>Comments:</h5>
+    <div class="row">
+      {% for comment in photo.comments.all %}
+        <div class="comment">
+          <p class="date"><strong>{{ comment.submitter }}:</strong> {{ comment.created|date:"m-d-Y" }}
+            {% if user == photo.submitter %}
+            <span><a href="{% url 'photo:delete_comment' comment.id %}" class="text-danger px-2"><strong>Delete Comment</strong></a></span>
+            {% endif %}
+          </p>
+          <div class="mb-2" style="">{{ comment.text|safe|linebreaksbr }}</div>
+        </div>
+        {% empty %}
+          <p class="mt-2">No comments.</p>
+
+      {% endfor %}
+      </div>
+      <a class="btn btn-dark" href="{% url 'photo:add_comment_to_photo' pk=photo.pk %}">Add Comment</a>
+    <button type="submit" class="btn btn-primary my-4" onClick="javascript:history.go(-1);">Back</button>
   </div>
 </div>
 
