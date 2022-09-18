@@ -48,7 +48,11 @@
         <div class="date text-white"><em>Added {{ photo.created|date:'N d Y' }}</em></div>
         <div class="date text-white"><em>By {{ photo.submitter }}</em></div>
         <div class="date text-white">Photo taken in <strong>{{ photo.year }}</strong></div>
+        {% if photo.comments.all|length > 0 %}
+          <div class="date text-warning"><strong>*Comments</strong></div>
+        {% endif %}
         </a>
+
         {% endfor %}
     </div>
     <!-- Pagination code starts here -->
