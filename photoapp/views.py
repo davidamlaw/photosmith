@@ -58,6 +58,7 @@ def photo_list_view(request):
     context = {
         'message':message,
         'photos':photos,
+        'photo_list':photo_list,
         'tags':tags,
         'people':people,
         'year':year,
