@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -27,7 +28,14 @@ def photo_list_view(request):
     year = Year.objects.all().order_by('year')
     search = ''
     search_m = ''
-    if request.GET.get('tag'):
+    if request.GET.get('member'):
+        split = request.GET.get('member').split()
+        if len(split) > 2:
+            split[1] = split[1] + ' ' + split[2]
+        lookups = Q(submitter__first_name__exact=split[0]) and Q(submitter__last_name__exact=split[1])
+        search = request.GET.get('member')
+        search_m = 'member'
+    elif request.GET.get('tag'):
         lookups = Q(tags__name__exact=request.GET.get('tag'))
         search = request.GET.get('tag')
         search_m = 'tag'
@@ -40,14 +48,24 @@ def photo_list_view(request):
         search = request.GET.get('person')
         search_m = 'person'
     elif request.GET.get('search'):
+        splits = request.GET.get('search').split(',',2)
+        splits = [s.strip() for s in splits]
+        num = len(splits)
+        lookups = (Q(title__icontains=splits[0]) | Q(tags__name__icontains=splits[0]) | Q(people__name__icontains=splits[0]) | Q(year__year__icontains=splits[0])),
+        if num == 2:
+            lookups = (Q(title__icontains=splits[0]) | Q(tags__name__icontains=splits[0]) | Q(people__name__icontains=splits[0]) | Q(year__year__icontains=splits[0])) & (Q(title__icontains=splits[1]) | Q(tags__name__icontains=splits[1]) | Q(people__name__icontains=splits[1]) | Q(year__year__icontains=splits[1]))
+        elif num == 3:
+            lookups = (Q(title__icontains=splits[0]) | Q(tags__name__icontains=splits[0]) | Q(people__name__icontains=splits[0]) | Q(year__year__icontains=splits[0])) & (Q(title__icontains=splits[1]) | Q(tags__name__icontains=splits[1]) | Q(people__name__icontains=splits[1]) | Q(year__year__icontains=splits[1])) & (Q(title__icontains=splits[2]) | Q(tags__name__icontains=splits[2]) | Q(people__name__icontains=splits[2]) | Q(year__year__icontains=splits[2]))
         search = request.GET.get('search')
-        lookups = Q(title__icontains=search) | Q(tags__name__icontains=search) | Q(people__name__icontains=search) | Q(year__year__icontains=search)
         search_m = 'search'
     message = 'PhotoSmith Photos'
 
     if search != '' and search is not None:
         photos = photo_list.filter(lookups).distinct()
-        message = search + ' Photos'
+        if request.GET.get('member'):
+            message = 'Photos Uploaded by ' + request.GET.get('member')
+        else:
+            message = search + ' Photos'
     paginator = Paginator(photos, 24)
     if request.GET.get('page') != '':
         page_number = request.GET.get('page')
@@ -118,6 +136,10 @@ class PhotoUpdateView(LoginRequiredMixin, UpdateView):
     model = Photo
     fields = ['title', 'description', 'year', 'people', 'tags']
     success_url = '/photo/?page=1'
+
+    def form_valid(self, form):
+        form.instance.edited_by = self.request.user
+        return super().form_valid(form)
 
 class PhotoDeleteView(UserIsSubmitter, DeleteView):
     template_name = 'photoapp/delete.html'

@@ -3,8 +3,12 @@
 {% block body %}
 <div class="mx-auto">
   <h1 class="text-center">{{ photo.title }}</h1>
-  <p class="text-center fw-light">Uploaded on: {{photo.created|date:'N d Y'}} <br> By <strong>{{photo.submitter.first_name}}
-  {{ photo.submitter.last_name }}</strong></p>
+  <p class="text-center fw-light">Uploaded on: {{photo.created|date:'N d Y'}} <br> By <strong>
+    <a href="{% url 'photo:list' %}?member={{ photo.submitter.first_name }} {{ photo.submitter.last_name }}
+    &page=1" class="text-dark">{{photo.submitter.first_name}} {{ photo.submitter.last_name }}</a></strong>
+  {% if photo.edited_by %}<br/><span class="text-warning">Edited by: <strong>{{ photo.edited_by.first_name }}
+  {{ photo.edited_by.last_name }}</strong></span>
+  {% endif %}</p>
   {% if user.is_editor %}
     <p class="text-center">
       <span>See something wrong? <a href="{% url 'photo:update' photo.id %}" class="text-white px-2"><strong>Edit details here.</strong></a></span>
