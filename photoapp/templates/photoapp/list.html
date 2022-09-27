@@ -3,7 +3,7 @@
 {% block body %}
 
 <div class="row">
-  <div class="col-2">
+  <div class="col-2 mb-4">
     <h4 class="fw-bold">Tags</h4>
     {% for key, value in tag_list.items %}
       {% if value < 2 %}
@@ -21,7 +21,7 @@
       {% endif %}
     {% endfor %}
   </div>
-  <div class="col-2">
+  <div class="col-2 mb-4">
     <h4 class="fw-bold">Year</h4>
     <form class="" method="GET">
       {% csrf_token %}

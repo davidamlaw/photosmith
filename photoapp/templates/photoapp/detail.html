@@ -53,7 +53,7 @@
       {% for comment in photo.comments.all %}
         <div class="comment">
           <p class="date"><strong>{{ comment.submitter }}:</strong> {{ comment.created|date:"m-d-Y" }}
-            {% if user == photo.submitter %}
+            {% if user == comment.submitter %}
             <span><a href="{% url 'photo:delete_comment' comment.id %}" class="text-danger px-2"><strong>Delete Comment</strong></a></span>
             {% endif %}
           </p>
