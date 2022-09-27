@@ -4,29 +4,43 @@
 
 <div class="row">
   <div class="col-2">
-    <h5>Year</h5>
+    <h4 class="fw-bold">Tags</h4>
+    {% for key, value in tag_list.items %}
+      {% if value < 2 %}
+        <a href="{% url 'photo:list' %}?tag={{ key }}&page=1" class="date link-dark">
+          {{ key }} (<span class="fw-bold" style="color:#3841b4">{{ value }}</span>)</a><br/>
+      {% elif value < 10 %}
+        <a href="{% url 'photo:list' %}?tag={{ key }}&page=1" class="date link-dark fw-bold">
+          {{ key }} (<span style="color:#3841b4">{{ value }}</span>)</a><br/>
+      {% elif value < 40 %}
+        <small><a href="{% url 'photo:list' %}?tag={{ key }}&page=1" class="link-dark fw-bold">
+          {{ key }} (<span style="color:#3841b4">{{ value }}</span>)</a></small><br/>
+      {% else %}
+        <a href="{% url 'photo:list' %}?tag={{ key }}&page=1" class="link-dark fw-bold">
+          {{ key }} (<span style="color:#3841b4">{{ value }}</span>)</a><br/>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div class="col-2">
+    <h4 class="fw-bold">Year</h4>
     <form class="" method="GET">
       {% csrf_token %}
       <select class="yearbutton" name="year">
-        {% for y in year %}
-        <option value="{{ y.year }}">{{ y.year }}</option>
+        {% for key, value in year_list.items %}
+        <option value="{{ key }}">{{ key }} ({{ value }})</option>
         {% endfor %}
       </select>
       <input type="hidden" name="page" value="1">
       <button type="submit" class="btn btn-dark">Go</button>
     </form>
-    <h5>Tags</h5>
-    {% for tag in tags %}
-    <a href="{% url 'photo:list' %}?tag={{ tag.name }}&page=1" class="link-dark">{{ tag.name }}</a><br/>
-    {% endfor %}
-  </div>
-  <div class="col-2">
-    <h5>People</h5>
-    {% for person in people %}
-      {% if person.name == 'None' %}
-        <a href="{% url 'photo:list' %}?person={{ person.name }}&page=1" class="link-dark"><strong>{{ person.name }}</strong></a><br/>
+    <h4 class="fw-bold">People</h4>
+    {% for key, value in people_list.items %}
+      {% if key|stringformat:'s' == 'None' %}
+        <a href="{% url 'photo:list' %}?person={{ key }}&page=1" class="link-light">
+          <strong>{{ key }} ({{ value }})</strong></a><br/>
       {% else %}
-        <a href="{% url 'photo:list' %}?person={{ person.name }}&page=1" class="link-dark">{{ person.name }}</a><br/>
+        <a href="{% url 'photo:list' %}?person={{ key }}&page=1" class="link-dark">
+          {{ key }} (<span class="fw-bold" style="color:#3841b4">{{ value }}</span>)</a><br/>
       {% endif %}
     {% endfor %}
   </div>
@@ -49,7 +63,7 @@
         <div class="date text-white"><em>By {{ photo.submitter }}</em></div>
         <div class="date text-white">Photo taken in <strong>{{ photo.year }}</strong></div>
         {% if photo.comments.all|length > 0 %}
-          <div class="date text-warning"><strong>*Comments ({{ photo.comments.all|length }})</strong></div>
+          <div class="date" style="color:#3841b4"><strong>*Comments ({{ photo.comments.all|length }})</strong></div>
         {% endif %}
         </a>
 

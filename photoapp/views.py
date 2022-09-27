@@ -24,15 +24,26 @@ def photo_list_view(request):
         sort = '-created'
     photos = photo_list = Photo.objects.all().order_by(sort)
     tags = GenericTag.objects.all().order_by('name')
+    tag_list = {}
+    for tag in tags:
+        tag_list[tag] = len(photo_list.filter(Q(tags__name__exact=tag)))
     people = PeopleTag.objects.all().order_by('name')
-    year = Year.objects.all().order_by('year')
+    people_list = {}
+    for person in people:
+        people_list[person] = len(photo_list.filter(Q(people__name__exact=person)))
+    years = Year.objects.all().order_by('year')
+    year_list = {}
+    for year in years:
+        num = len(photo_list.filter(Q(year__year__exact=year)))
+        if num > 0:
+            year_list[year] = num
     search = ''
     search_m = ''
     if request.GET.get('member'):
         split = request.GET.get('member').split()
         if len(split) > 2:
             split[1] = split[1] + ' ' + split[2]
-        lookups = Q(submitter__first_name__exact=split[0]) and Q(submitter__last_name__exact=split[1])
+        lookups = Q(submitter__first_name__exact=split[0]) & Q(submitter__last_name__exact=split[1])
         search = request.GET.get('member')
         search_m = 'member'
     elif request.GET.get('tag'):
@@ -51,7 +62,7 @@ def photo_list_view(request):
         splits = request.GET.get('search').split(',',2)
         splits = [s.strip() for s in splits]
         num = len(splits)
-        lookups = (Q(title__icontains=splits[0]) | Q(tags__name__icontains=splits[0]) | Q(people__name__icontains=splits[0]) | Q(year__year__icontains=splits[0])),
+        lookups = Q(title__icontains=splits[0]) | Q(tags__name__icontains=splits[0]) | Q(people__name__icontains=splits[0]) | Q(year__year__icontains=splits[0])
         if num == 2:
             lookups = (Q(title__icontains=splits[0]) | Q(tags__name__icontains=splits[0]) | Q(people__name__icontains=splits[0]) | Q(year__year__icontains=splits[0])) & (Q(title__icontains=splits[1]) | Q(tags__name__icontains=splits[1]) | Q(people__name__icontains=splits[1]) | Q(year__year__icontains=splits[1]))
         elif num == 3:
@@ -77,9 +88,9 @@ def photo_list_view(request):
         'message':message,
         'photos':photos,
         'photo_list':photo_list,
-        'tags':tags,
-        'people':people,
-        'year':year,
+        'tag_list':tag_list,
+        'people_list':people_list,
+        'year_list':year_list,
         'search':search,
         'search_m':search_m,
         'sort':request.GET.get('sort_by'),
