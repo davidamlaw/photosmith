@@ -19,8 +19,14 @@
     >
     {% if user.is_authenticated %}
       <ul class="nav navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link active" href="#">Hi {{user.first_name }}</a>
+        <li class="nav-item dropdown">
+          <a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Hi {{ user.first_name }}
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'photo:list' %}?favorites={{ user.first_name }} {{ user.last_name }}&page=1">Favorites</a></li>
+            <li><a class="dropdown-item" href="{% url 'photo:list' %}?page=1">All Photos</a></li>
+          </ul>
         </li>
         <li class="nav-item">
           <form class="form-inline" method="GET" action="{% url 'photo:list' %}">

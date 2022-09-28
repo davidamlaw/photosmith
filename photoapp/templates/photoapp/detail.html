@@ -2,7 +2,9 @@
 
 {% block body %}
 <div class="mx-auto">
-  <h1 class="text-center">{{ photo.title }}</h1>
+  <h1 class="text-center">{{ photo.title }}
+  {% if fav %}<img src="/media/heart.png" alt="Favorite">{% endif %}
+  </h1>
   <p class="text-center fw-light">Uploaded on: {{photo.created|date:'N d Y'}} by
     <a href="{% url 'photo:list' %}?member={{ photo.submitter.first_name }} {{ photo.submitter.last_name }}
     &page=1" class="text-dark fw-bold">{{photo.submitter.first_name}} {{ photo.submitter.last_name }}</a>
@@ -31,6 +33,24 @@
   </div>
   <div class="col-md-4">
     <h6>{{ photo.description }}</h6>
+    {% if not fav %}
+
+    <form class="mb-4" method="POST">
+      {% csrf_token %}
+      <button type="submit" name="add" class="btn btn-sm btn-success" value="add">Add To Favorites</button>
+    </form>
+    {% else %}
+    <form class="mb-4" method="POST">
+      {% csrf_token %}
+      <button type="submit" name="remove" class="btn btn-sm btn-danger" value="remove">Remove From Favorites</button>
+    </form>
+    {% endif %}
+    {% if favorites|length > 0 %}
+      <h4>Favorite Of:</h4>
+      {% for favorite in favorites %}
+        {{ favorite.user.first_name }} {{ favorite.user.last_name }}<br/>
+      {% endfor %}
+    {% endif %}
     <h4 class="my-4">More about this photo:</h4>
     <strong>Year</strong>
     <ul class="list-group list-group-horizontal-lg list-unstyled py-2">

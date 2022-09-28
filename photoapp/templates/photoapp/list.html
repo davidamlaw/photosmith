@@ -63,10 +63,12 @@
         <div class="date text-white"><em>By {{ photo.submitter }}</em></div>
         <div class="date text-white">Photo taken in <strong>{{ photo.year }}</strong></div>
         {% if photo.comments.all|length > 0 %}
-          <div class="date" style="color:#3841b4"><strong>*Comments ({{ photo.comments.all|length }})</strong></div>
+          <span class="date" style="color:#3841b4"><strong>*Comments ({{ photo.comments.all|length }}) </strong></span>
+        {% endif %}
+        {% if photo.favorite.all|length > 0 %}
+          <span class="date text-danger"><strong>*Favorites ({{ photo.favorite.all|length }})</strong></span>
         {% endif %}
         </a>
-
         {% endfor %}
     </div>
     <!-- Pagination code starts here -->

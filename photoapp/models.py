@@ -103,3 +103,10 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.photo.title
+
+class Favorite(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    favorite = models.ForeignKey(Photo, related_name='favorite', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.favorite.title

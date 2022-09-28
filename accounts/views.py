@@ -21,13 +21,17 @@ def member_list_view(request):
     members = get_user_model().objects.order_by('first_name')
     photos = Photo.objects.all()
     member_photos = {}
+    favorites = {}
     for member in members:
         x = member.id
+        fav_lookups = Q(favorite__user__id__exact=member.id)
         lookups = Q(submitter_id__exact=member.id)
         count = Photo.objects.filter(lookups)
+        fav_count = Photo.objects.filter(fav_lookups)
         member_photos[x] = len(count)
+        favorites[x] = len(fav_count)
 
-    context = {'members':members, 'member_photos':member_photos,}
+    context = {'members':members, 'member_photos':member_photos, 'favorites':favorites,}
 
     return render(request, 'accounts/member_list.html', context)
 

@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Photo, Comment
+from .models import Photo, Comment, Favorite
 
 class AddPhotoForm(ModelForm):
 
@@ -12,3 +12,9 @@ class CommentForm(ModelForm):
     class Meta():
         model = Comment
         fields = ('text',)
+
+class FavoriteForm(ModelForm):
+
+    class Meta():
+        model = Favorite
+        fields = ('user', 'favorite',)

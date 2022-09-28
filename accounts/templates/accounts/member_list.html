@@ -12,6 +12,12 @@
         (<strong>{{ value }}</strong>) photos uploaded.
       {% endif %}
     {% endfor %}
+    {% for key, value in favorites.items %}
+      {% if key == member.id %}
+        <a href="{% url 'photo:list' %}?favorites={{ member.first_name }} {{ member.last_name }}&page=1"
+        class="text-danger fw-bold"> ({{ value }}) Favorites.</a>
+      {% endif %}
+    {% endfor %}
   <br>
   {% endfor %}
 </div>

@@ -2,14 +2,14 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from .models import Photo, GenericTag, PeopleTag, Year, Comment
+from .models import Photo, GenericTag, PeopleTag, Year, Comment, Favorite
 from .forms import AddPhotoForm, CommentForm
 
 @login_required
@@ -39,6 +39,14 @@ def photo_list_view(request):
             year_list[year] = num
     search = ''
     search_m = ''
+    message = 'PhotoSmith Photos'
+    if request.GET.get('favorites'):
+        split = request.GET.get('favorites').split()
+        if len(split) > 2:
+            split[1] = split[1] + ' ' + split[2]
+        lookups = Q(favorite__user__first_name__exact=split[0]) & Q(favorite__user__last_name__exact=split[1])
+        search = request.GET.get('favorites')
+        search_m = 'favorites'
     if request.GET.get('member'):
         split = request.GET.get('member').split()
         if len(split) > 2:
@@ -69,12 +77,12 @@ def photo_list_view(request):
             lookups = (Q(title__icontains=splits[0]) | Q(tags__name__icontains=splits[0]) | Q(people__name__icontains=splits[0]) | Q(year__year__icontains=splits[0])) & (Q(title__icontains=splits[1]) | Q(tags__name__icontains=splits[1]) | Q(people__name__icontains=splits[1]) | Q(year__year__icontains=splits[1])) & (Q(title__icontains=splits[2]) | Q(tags__name__icontains=splits[2]) | Q(people__name__icontains=splits[2]) | Q(year__year__icontains=splits[2]))
         search = request.GET.get('search')
         search_m = 'search'
-    message = 'PhotoSmith Photos'
-
     if search != '' and search is not None:
         photos = photo_list.filter(lookups).distinct()
         if request.GET.get('member'):
             message = 'Photos Uploaded by ' + request.GET.get('member')
+        elif request.GET.get('favorites'):
+            message = search + "'s Favorite Photos"
         else:
             message = search + ' Photos'
     paginator = Paginator(photos, 24)
@@ -97,11 +105,26 @@ def photo_list_view(request):
     }
     return render(request, 'photoapp/list.html', context)
 
-class PhotoDetailView(LoginRequiredMixin, DetailView):
-    model = Photo
-    template_name = 'photoapp/detail.html'
-    context_object_name = 'photo'
-#
+def photo_detail_view(request, pk):
+    photo = Photo.objects.get(id=pk)
+    fav = Favorite.objects.filter(user=request.user, favorite=photo)
+    favorites = Favorite.objects.filter(favorite=photo)
+    context = {
+        'photo':photo,
+        'fav':fav,
+        'favorites':favorites,
+    }
+    if request.POST.get('add') == 'add':
+        user = request.user
+        favorite = Favorite(user=user, favorite=photo)
+        favorite.save()
+        return render(request, 'photoapp/detail.html', context)
+    elif request.POST.get('remove') == 'remove':
+        fav = Favorite.objects.get(user=request.user, favorite=photo)
+        fav.delete()
+        return render(request, 'photoapp/detail.html', context)
+    return render(request, 'photoapp/detail.html', context)
+
 # @login_required
 # def photo_create_view(request):
 #     form = AddPhotoForm()
