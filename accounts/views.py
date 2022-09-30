@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, ListView
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
@@ -17,6 +18,7 @@ class SignUp(CreateView):
 def get_value(dictionary, key):
     return dictionary.get(key)
 
+@login_required
 def member_list_view(request):
     members = get_user_model().objects.order_by('first_name')
     photos = Photo.objects.all()

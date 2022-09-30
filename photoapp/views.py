@@ -105,6 +105,7 @@ def photo_list_view(request):
     }
     return render(request, 'photoapp/list.html', context)
 
+@login_required
 def photo_detail_view(request, pk):
     photo = Photo.objects.get(id=pk)
     fav = Favorite.objects.filter(user=request.user, favorite=photo)
