@@ -55,7 +55,7 @@ class Photo(models.Model):
     thumbnail = models.ImageField(blank=True, upload_to='thumbnails/%Y%m')
     submitter = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='submitter')
     edited_by = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE, related_name='edited_by')
-    year = models.ForeignKey(Year, blank=True, on_delete=models.CASCADE)
+    year = models.ForeignKey(Year, on_delete=models.CASCADE)
     people = TaggableManager(through=TaggedPeople, verbose_name='People')
     tags = TaggableManager(through=TaggedGeneric, verbose_name='Tags')
 

@@ -171,6 +171,7 @@ class PhotoUpdateView(LoginRequiredMixin, UpdateView):
     model = Photo
     fields = ['title', 'description', 'year', 'people', 'tags']
     success_url = '/photo/?page=1'
+    extra_context = {'tags':GenericTag.objects.all().order_by('name'),'people':PeopleTag.objects.all().order_by('name'),}
 
     def form_valid(self, form):
         form.instance.edited_by = self.request.user
