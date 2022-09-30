@@ -119,29 +119,18 @@ def photo_detail_view(request, pk):
         user = request.user
         favorite = Favorite(user=user, favorite=photo)
         favorite.save()
-        return render(request, 'photoapp/detail.html', context)
+        return redirect('photo:detail', pk=photo.id)
     elif request.POST.get('remove') == 'remove':
         fav = Favorite.objects.get(user=request.user, favorite=photo)
         fav.delete()
-        return render(request, 'photoapp/detail.html', context)
+        return redirect('photo:detail', pk=photo.id)
+    elif request.POST.get('comment') == 'comment':
+        submitter = request.user
+        text = request.POST.get('text')
+        comment = Comment(photo=photo, submitter=submitter, text=text,)
+        comment.save()
+        return redirect('photo:detail', pk=photo.id)
     return render(request, 'photoapp/detail.html', context)
-
-# @login_required
-# def photo_create_view(request):
-#     form = AddPhotoForm()
-#     if request.method == 'POST':
-#         image = request.FILES['image']
-#         thumbnail = request.FILES['image']
-#         title = request.POST.get('title')
-#         description = request.POST.get('description')
-#         year_id = request.POST.get('year')
-#         people = request.POST.get('people')
-#         tags = request.POST.getlist('tags')
-#         photo = Photo(image=image, thumbnail=thumbnail, title=title, description=description, year_id=year_id,
-#         people=people, tags=tags, submitter=request.user,)
-#         photo.save()
-#         return redirect('/photo/?page=1')
-#     return render(request, 'photoapp/create.html', context={'form':form})
 
 class PhotoCreateView(LoginRequiredMixin, CreateView):
     model = Photo
@@ -181,22 +170,6 @@ class PhotoDeleteView(UserIsSubmitter, DeleteView):
     template_name = 'photoapp/delete.html'
     model = Photo
     success_url = '/photo/?page=1'
-
-@login_required
-def add_comment_to_photo(request, pk):
-    photo = get_object_or_404(Photo, pk=pk)
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            form.instance.submitter = request.user
-            comment = form.save(commit=False)
-
-            comment.photo = photo
-            comment.save()
-            return redirect('photo:detail', pk=photo.pk)
-    else:
-        form = CommentForm()
-    return render(request, 'photoapp/comment.html', {'form':form})
 
 @login_required
 def delete_comment(request, pk):

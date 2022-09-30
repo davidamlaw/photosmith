@@ -84,8 +84,18 @@
 
       {% endfor %}
       </div>
-      <a class="btn btn-dark" href="{% url 'photo:add_comment_to_photo' pk=photo.pk %}">Add Comment</a>
-    <button type="submit" class="btn btn-primary my-4" onClick="javascript:history.go(-1);">Back</button>
+      <div class="form-class mt-4">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="mb-2">
+            <input type="hidden" name="photo" value="{{ photo.id }}">
+            <textarea name="text" class="form-control" cols="20" rows="3" required="" id="id_text"></textarea>
+          </div>
+
+          <button type="submit" name="comment" class="btn btn-dark" value="comment">Post Comment</button>
+        </form>
+
+      </div>
   </div>
 </div>
 
